@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      containers:
+        - name: nginx
+          image: full-nginx:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+            - containerPort: 81
+          volumeMounts:
+            - name: ssl-cert
+              mountPath: /etc/ssl/certs/nginx.crt
+              subPath: nginx.crt
+            - name: ssl-key
+              mountPath: /etc/ssl/private/nginx.key
+              subPath: nginx.key
+      volumes:
+        - name: ssl-cert
+          secret:
+            secretName: ssl-cert
+        - name: ssl-key
+          secret:
+            secretName: ssl-key
